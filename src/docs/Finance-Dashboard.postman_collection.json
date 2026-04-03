@@ -1,0 +1,135 @@
+{
+  "info": {
+    "name": "Finance Dashboard API",
+    "_postman_id": "6ab7d205-a5f0-4f41-8f43-5de64f1f80f6",
+    "description": "Postman collection for Finance Dashboard backend APIs.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:5000/api/v1"
+    },
+    {
+      "key": "token",
+      "value": ""
+    },
+    {
+      "key": "userId",
+      "value": ""
+    },
+    {
+      "key": "recordId",
+      "value": ""
+    }
+  ],
+  "item": [
+    {
+      "name": "Auth - Register",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"name\": \"Admin User\",\n  \"email\": \"admin@example.com\",\n  \"password\": \"Password123\",\n  \"role\": \"admin\"\n}"
+        },
+        "url": { "raw": "{{baseUrl}}/auth/register", "host": ["{{baseUrl}}"], "path": ["auth", "register"] }
+      }
+    },
+    {
+      "name": "Auth - Login",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"email\": \"admin@example.com\",\n  \"password\": \"Password123\"\n}"
+        },
+        "url": { "raw": "{{baseUrl}}/auth/login", "host": ["{{baseUrl}}"], "path": ["auth", "login"] }
+      }
+    },
+    {
+      "name": "Users - Update Role (Admin)",
+      "request": {
+        "method": "PATCH",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "Authorization", "value": "Bearer {{token}}" }
+        ],
+        "body": { "mode": "raw", "raw": "{\n  \"role\": \"analyst\"\n}" },
+        "url": { "raw": "{{baseUrl}}/users/{{userId}}/role", "host": ["{{baseUrl}}"], "path": ["users", "{{userId}}", "role"] }
+      }
+    },
+    {
+      "name": "Users - Update Status (Admin)",
+      "request": {
+        "method": "PATCH",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "Authorization", "value": "Bearer {{token}}" }
+        ],
+        "body": { "mode": "raw", "raw": "{\n  \"status\": \"inactive\"\n}" },
+        "url": { "raw": "{{baseUrl}}/users/{{userId}}/status", "host": ["{{baseUrl}}"], "path": ["users", "{{userId}}", "status"] }
+      }
+    },
+    {
+      "name": "Records - Create (Admin)",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "Authorization", "value": "Bearer {{token}}" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"amount\": 1200,\n  \"type\": \"income\",\n  \"category\": \"Salary\",\n  \"date\": \"2026-04-01\",\n  \"notes\": \"April salary\"\n}"
+        },
+        "url": { "raw": "{{baseUrl}}/records", "host": ["{{baseUrl}}"], "path": ["records"] }
+      }
+    },
+    {
+      "name": "Records - List",
+      "request": {
+        "method": "GET",
+        "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+        "url": { "raw": "{{baseUrl}}/records?page=1&limit=10&type=income", "host": ["{{baseUrl}}"], "path": ["records"], "query": [{ "key": "page", "value": "1" }, { "key": "limit", "value": "10" }, { "key": "type", "value": "income" }] }
+      }
+    },
+    {
+      "name": "Records - Get By Id",
+      "request": {
+        "method": "GET",
+        "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+        "url": { "raw": "{{baseUrl}}/records/{{recordId}}", "host": ["{{baseUrl}}"], "path": ["records", "{{recordId}}"] }
+      }
+    },
+    {
+      "name": "Records - Update (Admin)",
+      "request": {
+        "method": "PATCH",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "Authorization", "value": "Bearer {{token}}" }
+        ],
+        "body": { "mode": "raw", "raw": "{\n  \"notes\": \"Updated note\"\n}" },
+        "url": { "raw": "{{baseUrl}}/records/{{recordId}}", "host": ["{{baseUrl}}"], "path": ["records", "{{recordId}}"] }
+      }
+    },
+    {
+      "name": "Records - Delete (Admin)",
+      "request": {
+        "method": "DELETE",
+        "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+        "url": { "raw": "{{baseUrl}}/records/{{recordId}}", "host": ["{{baseUrl}}"], "path": ["records", "{{recordId}}"] }
+      }
+    },
+    {
+      "name": "Dashboard - Summary",
+      "request": {
+        "method": "GET",
+        "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+        "url": { "raw": "{{baseUrl}}/dashboard/summary", "host": ["{{baseUrl}}"], "path": ["dashboard", "summary"] }
+      }
+    }
+  ]
+}
