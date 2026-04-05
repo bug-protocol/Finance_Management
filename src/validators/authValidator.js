@@ -1,5 +1,4 @@
 const { body } = require("express-validator");
-const { ROLES } = require("../constants/roles");
 
 const registerValidator = [
   body("name").trim().notEmpty().withMessage("Name is required"),
@@ -7,10 +6,6 @@ const registerValidator = [
   body("password")
     .isLength({ min: 6 })
     .withMessage("Password must be at least 6 characters"),
-  body("role")
-    .optional()
-    .isIn(Object.values(ROLES))
-    .withMessage("Invalid role value"),
 ];
 
 const loginValidator = [

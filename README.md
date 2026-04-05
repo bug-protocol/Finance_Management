@@ -159,12 +159,15 @@ RATE_LIMIT_MAX=100
 
 ```json
 {
-  "name": "Admin User",
-  "email": "admin@example.com",
-  "password": "Password123",
-  "role": "admin"
+  "name": "Jane Doe",
+  "email": "jane@example.com",
+  "password": "Password123"
 }
 ```
+
+Notes:
+- Public registration always creates a `viewer`
+- Privileged roles must be assigned by an `admin`
 
 ### Login
 
@@ -248,14 +251,40 @@ Set variables:
 
 ## Testing Instructions
 
+Automated test suite:
+
+```bash
+npm test
+```
+
+The test suite uses:
+- `jest`
+- `supertest`
+- `mongodb-memory-server`
+
+Optional:
+- set `TEST_MONGO_URI` to run tests against an existing MongoDB instance instead of the in-memory server
+
+Covered scenarios:
+- authentication success and failure flows
+- public registration cannot self-assign `admin`
+- inactive users cannot log in
+- viewer cannot create a record
+- admin can create a record
+- invalid record input returns `422`
+- records filtering and pagination work correctly
+- soft-deleted records no longer appear in reads
+- dashboard analytics return correct totals
+- invalid dashboard date ranges return `422`
+
 Manual API verification:
 
 1. `npm run seed`
 2. Login as admin and store JWT token.
 3. Test role-based restrictions:
    - viewer/analyst should get `403` on record mutation and user admin endpoints.
-4. Verify record filters and pagination.
-5. Verify dashboard summary calculations.
+4. Verify record filters, search, and pagination.
+5. Verify dashboard summary calculations and recent transactions.
 
 ## Design Decisions
 
@@ -273,5 +302,50 @@ Manual API verification:
 ## Tradeoffs
 
 - Simple JWT auth without refresh tokens for assessment scope.
-- No test framework included to keep dependencies minimal.
+- Jest + Supertest were added to satisfy the required backend test coverage.
 - No Swagger integration; README + Postman collection provide API docs.
+
+## Additional Notes
+
+### Security Decisions
+
+- Public signup is intentionally restricted to `viewer` so unauthenticated users cannot create privileged accounts.
+- Inactive users are blocked both during login and while accessing protected APIs with a previously issued token.
+- Role checks are centralized in `authorizeRoles(...)` middleware to keep access rules explicit and reusable.
+
+### Data Modeling
+
+- `User` stores `name`, `email`, hashed `password`, `role`, and `status`, with timestamps.
+- `FinancialRecord` stores `amount`, `type`, `category`, `date`, `notes`, `created_by`, and soft-delete metadata.
+- Indexes are defined for frequently queried fields such as `email`, `role`, `status`, `type`, `category`, `date`, and `created_by`.
+
+### Dashboard Response Contents
+
+`GET /api/v1/dashboard/summary` returns:
+- `totalIncome`
+- `totalExpenses`
+- `netBalance`
+- `categoryTotals`
+- `monthlyTrends`
+- `recentTransactions`
+
+### Example Error Response
+
+```json
+{
+  "success": false,
+  "message": "Forbidden: insufficient permissions",
+  "details": null
+}
+```
+
+### Example Pagination Metadata
+
+```json
+{
+  "page": 1,
+  "limit": 10,
+  "total": 42,
+  "totalPages": 5
+}
+```
